@@ -2,7 +2,9 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gtk, GObject, GLib
+from gi.repository import AppIndicator3 as appindicator
 from time import sleep
 import threading
 from sys import path
@@ -28,24 +30,26 @@ class trayIcon(object):
         Gtk.main_quit()
 
     def __init__(self):
-        self.statusIcon = Gtk.StatusIcon()
-        self.statusIcon.set_visible(True)
-        self.statusIcon.connect("activate", self.leftclick)
-        self.statusIcon.connect('popup-menu', self.icon_clicked)
+#        self.statusIcon = Gtk.StatusIcon()
+        self.statusIcon = appindicator.Indicator.new("nm-appindicator","nm-no-connection",appindicator.IndicatorCategory.HARDWARE)
+        self.statusIcon.set_status (appindicator.IndicatorStatus.ACTIVE)
+#        self.statusIcon.set_visible(True)
+#        self.statusIcon.connect("activate", self.leftclick)
+#        self.statusIcon.connect('popup-menu', self.icon_clicked)
 
-    def leftclick(self, status_icon):
-        if not self.thr.is_alive():
-            self.thr.start()
-        button = 1
-        time = Gtk.get_current_event_time()
-        position = Gtk.StatusIcon.position_menu
-        self.nm_menu().popup(None, None, position, status_icon, button, time)
+#    def leftclick(self, status_icon):
+#        if not self.thr.is_alive():
+#            self.thr.start()
+#        button = 1
+#        time = Gtk.get_current_event_time()
+#        position = Gtk.StatusIcon.position_menu
+#        self.nm_menu().popup(None, None, position, status_icon, button, time)
 
-    def icon_clicked(self, status_icon, button, time):
-        if not self.thr.is_alive():
-            self.thr.start()
-        position = Gtk.StatusIcon.position_menu
-        self.nm_menu().popup(None, None, position, status_icon, button, time)
+#    def icon_clicked(self, status_icon, button, time):
+#        if not self.thr.is_alive():
+#            self.thr.start()
+#        position = Gtk.StatusIcon.position_menu
+#        self.nm_menu().popup(None, None, position, status_icon, button, time)
 
     def nm_menu(self):
         self.menu = Gtk.Menu()
@@ -265,12 +269,14 @@ class trayIcon(object):
 
     def updatetray(self, defaultdev, default_type):
         self.updatetrayicon(defaultdev, default_type)
-        self.trayStatus(defaultdev)
+        self.statusIcon.set_menu(self.nm_menu())
+#        self.trayStatus(defaultdev)
 
     def updatetrayloop(self):
         while True:
             self.checkfornewcard()
             self.updateinfo()
+#            self.statusIcon.set_menu(self.nm_menu())
             self.ifruning = False
             sleep(20)
 
@@ -297,29 +303,34 @@ class trayIcon(object):
 
     def updatetrayicon(self, defaultdev, card_type):
         if card_type is None:
-            self.statusIcon.set_from_icon_name('nm-no-connection')
+            self.statusIcon.set_icon('nm-no-connection')
+#            print('no network connection')
         elif card_type == 'wire':
-            self.statusIcon.set_from_icon_name('nm-adhoc')
+            self.statusIcon.set_icon('nm-adhoc')
+#            print('wired network connection')
         else:
             wifi_state = self.default_wifi_state(defaultdev)
             if wifi_state is None:
-                self.statusIcon.set_from_icon_name('nm-no-connection')
+                self.statusIcon.set_icon('nm-no-connection')
             elif wifi_state > 80:
-                self.statusIcon.set_from_icon_name('nm-signal-100')
+                self.statusIcon.set_icon('nm-signal-100')
             elif wifi_state > 60:
-                self.statusIcon.set_from_icon_name('nm-signal-75')
+                self.statusIcon.set_icon('nm-signal-75')
             elif wifi_state > 40:
-                self.statusIcon.set_from_icon_name('nm-signal-50')
+                self.statusIcon.set_icon('nm-signal-50')
             elif wifi_state > 20:
-                self.statusIcon.set_from_icon_name('nm-signal-25')
+                self.statusIcon.set_icon('nm-signal-25')
             else:
-                self.statusIcon.set_from_icon_name('nm-signal-00')
+                self.statusIcon.set_icon('nm-signal-00')
+#            print('wireless network connection')
 
-    def trayStatus(self, defaultdev):
-        self.statusIcon.set_tooltip_text("%s" % connectionStatus(defaultdev))
+#    def trayStatus(self, defaultdev):
+#        self.statusIcon.set_tooltip_text("%s" % connectionStatus(defaultdev))
 
     def tray(self):
         self.ifruning = False
+        self.updateinfo()
+        self.statusIcon.set_menu(self.nm_menu())
         self.thr = threading.Thread(target=self.updatetrayloop)
         self.thr.setDaemon(True)
         self.thr.start()
