@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -299,7 +299,7 @@ class trayIcon(object):
     def checkfornewcard(self):
         if os.path.exists("/usr/local/bin/netcardmgr"):
             if isanewnetworkcardinstall() is True:
-                os.system("netcardmgr")
+                os.system("doas netcardmgr")
 
     def updatetrayicon(self, defaultdev, card_type):
         if card_type is None:
