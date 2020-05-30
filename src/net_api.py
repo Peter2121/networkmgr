@@ -36,23 +36,8 @@ from time import sleep
 
 path.append("/usr/local/share/networkmgr")
 ncard = 'ifconfig -l'
-notnics = [
-    "lo",
-    "fwe",
-    "fwip",
-    "tap",
-    "plip",
-    "pfsync",
-    "pflog",
-    "tun",
-    "sl",
-    "faith",
-    "ppp",
-    "brige",
-    "ixautomation",
-    "vm-ixautomation",
-    "wg"
-]
+notnics = ["lo", "fwe", "fwip", "tap", "plip", "pfsync", "pflog",
+           "tun", "sl", "faith", "ppp", "brige", "ixautomation"]
 
 cmd = "kenv | grep rc_system"
 rc_system = Popen(cmd, shell=True, stdout=PIPE, universal_newlines=True)
@@ -310,40 +295,40 @@ def connectionStatus(card):
 
 
 def stopallnetwork():
-    os.system(f'{rc}service {network} stop')
+    os.system(f'doas {rc}service {network} stop')
     sleep(1)
 
 
 def startallnetwork():
-    os.system(f'{rc}service {network} start')
+    os.system(f'doas {rc}service {network} start')
     sleep(1)
 
 
 def stopnetworkcard(netcard):
-    os.system(f'ifconfig {netcard} down')
+    os.system(f'doas ifconfig {netcard} down')
     sleep(1)
 
 
 def startnetworkcard(netcard):
-    os.system(f'ifconfig {netcard} up')
+    os.system(f'doas ifconfig {netcard} up')
     sleep(1)
 
 
 def wifiDisconnection(wificard):
-    os.system(f'ifconfig {wificard} down')
-    os.system(f"ifconfig {wificard} ssid 'none'")
-    os.system(f'ifconfig {wificard} up')
+    os.system(f'doas ifconfig {wificard} down')
+    os.system(f"doas ifconfig {wificard} ssid 'none'")
+    os.system(f'doas ifconfig {wificard} up')
     sleep(1)
 
 
 def disableWifi(wificard):
-    os.system(f'ifconfig {wificard} down')
+    os.system(f'doas ifconfig {wificard} down')
     sleep(1)
 
 
 def enableWifi(wificard):
-    os.system(f'ifconfig {wificard} up')
-    os.system(f'ifconfig {wificard} up scan')
+    os.system(f'doas ifconfig {wificard} up')
+    os.system(f'doas ifconfig {wificard} up scan')
     sleep(1)
 
 # work around of iwm on FreeBSD 12.0
@@ -352,28 +337,28 @@ def start_wifi():
    for nic in crd.stdout.readlines()[0].rstrip().split():
        print(nic)
        if 'wlan' in nic:
-           os.system(f'wpa_supplicant -B -i {nic} -c /etc/wpa_supplicant.conf')
+           os.system(f'doas wpa_supplicant -B -i {nic} -c /etc/wpa_supplicant.conf')
            sleep(0.5)
-           os.system(f'ifconfig {nic} up')
+           os.system(f'doas ifconfig {nic} up')
            sleep(0.5)
-           os.system(f'ifconfig {nic} scan')
+           os.system(f'doas ifconfig {nic} scan')
            sleep(2)
-           os.system(f'dhclient {nic}')
-
+           os.system(f'doas dhclient {nic}')
+   
 
 def connectToSsid(name, wificard):
-    os.system(f'killall wpa_supplicant')
+    os.system(f'doas killall wpa_supplicant')
     sleep(0.5)
-    os.system(f"ifconfig {wificard} ssid '{name}'")
+    os.system(f"doas ifconfig {wificard} ssid '{name}'")
     sleep(0.5)
-    os.system(f'wpa_supplicant -B -i {wificard} -c /etc/wpa_supplicant.conf')
+    os.system(f'doas wpa_supplicant -B -i {wificard} -c /etc/wpa_supplicant.conf')
     sleep(0.5)
-    os.system(f'ifconfig {wificard} up')
+    os.system(f'doas ifconfig {wificard} up')
     sleep(0.5)
-    os.system(f'ifconfig {wificard} scan')
+    os.system(f'doas ifconfig {wificard} scan')
     if openrc is False:
         sleep(2)
-        os.system(f'dhclient {wificard}')
+        os.system(f'doas dhclient {wificard}')
     sleep(0.5)
 
 def subnetHexToDec( ifconfigstring ):
