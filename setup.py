@@ -40,7 +40,6 @@ data_files = [
     (f'{prefix}/share/networkmgr', ['src/authentication.py']),
     (f'{prefix}/share/networkmgr', ['src/net_api.py']),
     (f'{prefix}/share/networkmgr', ['src/trayicon.py']),
-    (f'{prefix}/etc/sudoers.d', ['src/sudoers.d/networkmgr'])
 ]
 
 data_files.extend(datafilelist(f'{prefix}/share/icons/hicolor', 'src/icons'))
