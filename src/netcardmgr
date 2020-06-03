@@ -222,9 +222,10 @@ class netCardConfigWindow(Gtk.Window):
         DNSList = [(key, value) for key, value in currentSettings.items() if key.startswith("DNS Server")]
         i = 0
         DNSString = ""
-        while i < len(DNSList):
-            DNSString = DNSString + DNSList[i][i + 1]
-            if i + 1 < len(DNSList):
+        imax=len(DNSList)
+        while i < imax:
+            DNSString = DNSString + DNSList[i][1]
+            if i + 1 < imax:
                 DNSString = DNSString + ","
             i = i + 1
         dnsEntry.set_text(DNSString)
@@ -511,7 +512,8 @@ class netCardConfigWindow(Gtk.Window):
                 aIntGatewayStrip = str(aIntGatewayStrip).replace("]","")
                 aIntGatewayStrip = str(aIntGatewayStrip).replace(";","")
 
-                aIntDHCP = f"resolvconf -l {aInt}.dhcp"  
+#                aIntDHCP = f"resolvconf -l {aInt}.dhcp"  
+                aIntDHCP = f"resolvconf -l {aInt}"  
                 aIntDHCPResults = subprocess.check_output(aIntDHCP.split(" "))  
                 DNSMatch = re.findall('nameserver [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' ,str(aIntDHCPResults))
 
